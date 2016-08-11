@@ -6,16 +6,17 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(tidy = TRUE,cache=TRUE,warning = FALSE,
-                      comment = "#>",fig.width = 6,fig.height = 4)
+knitr::opts_chunk$set(tidy = TRUE,cache=FALSE,warning = FALSE,
+                      comment = "#>",fig.width = 9,fig.height = 6,fig.align = "center",
+                      dpi = 300)
 ```
 
 ## Intro
 
-This is R Markdown document provides all code necessary code to run the analysis on chemical profiles of preen gland samples of three Madagascan plover species (Kittlitz´s-, Madagascar- and White-fronted). Samples have been processed by gas-chromatography and peaks were called using **Xcalibur 2.0.5**. All further steps are reproducible with the code delivered within this document.
+This is R Markdown document provides all code necessary code to run the analysis on chemical profiles of preen gland samples of three Madagascan plover species (Kittlitz´s-, Madagascar- and White-fronted). Samples have been processed by gas-chromatography and peaks were called using **Xcalibur 2.0.5**. All further steps are reproducible with the code delivered within this document. The Document is under development and will be updated while running the analysis!
 
 ```{r,fig.align='center',echo=FALSE}
-knitr::include_graphics("docs/plover-pics.png")
+knitr::include_graphics("plover-pics.png")
 ```
 
 ## Getting started: Load the data and packages to the Global Environment
@@ -67,7 +68,9 @@ load("data/charadrius_peaks_aligned.RData") # GCalignR output
 # normalise the peak abundancies
 scent <- GCalignR::norm_peaks(charadrius_peaks_aligned,conc_col_name = "area",rt_col_name = "rt",out = "data.frame")  
 scent <- log(scent + 1) # log+1 transformation to reduce mean-variance trends
-factors <- read.csv("data/factors.csv",sep = ";",skip = 1) # Comprises all available covariates 
+factors <- read.csv("data/factors.csv",sep = ";",skip = 1) # Comprises all available covariates
+factors$pair <- paste0(factors$Species,factors$Nest_Brood) # unique "pairs"
+factors$pair[is.na(factors$Nest_Brood)] <- NA # Drop unknown Individuals from "pairs"
 row.names(factors) <- as.character(tolower(factors$GC_Sample)) # for cross-reference with gc-data
 scent <- scent[match(row.names(factors),row.names(scent)),] # same order of rows is crucial 
 # The data includes duplicates for three plover individuals
@@ -79,7 +82,7 @@ pander::pandoc.table(factors[indices,c(2:7,9,12,17,18,19)])
 
 Since one MP (FH47040) was sampled twice during brooding, we average the to samples, thereby we avoid pseudoreplication. 
 
-```{}
+```{r}
 samples <- which(factors$Ring=="FH47040") # corresponding sample rows
 scent[samples[1],] <- unlist(lapply(1:ncol(scent),function(x){ # average the samples
 if(any(scent[samples,x]>0)) {
@@ -111,11 +114,15 @@ m1 <- nmds_calculator(scent = scent,factors = factors,sub = list(Age ="A")) # we
 nmds_m1 <- m1$nmds # nmds-coordinates + factors
 scent_m1 <- m1$scent # scent matrix, subsetted
 factors_m1 <- m1$factors # factors, subsetted 
-nmds_plotter(nmds = nmds_m1,main = "Adults") # plot 
-```` 
+nmds_plotter(nmds = nmds_m1,main = "Plover Preen Profiles\nat all parental care stages") # plot the results
+```
+
 ```{r}
-beta1 <- vegan::betadisper(vegan::vegdist(scent_m1,method = "bray"), factors_m1$Species) # Dispersion effect
-anova(beta1)
+beta1 <- vegan::betadisper(vegan::vegdist(scent_m1,method = "bray"), factors_m1$Species) 
+anova(beta1) # There is a dispersion effect, i.e. variance is not equal among Species
 TukeyHSD(beta1) # post-hoc test
-vegan::adonis(scent_m1~factors_m1$Species*factors_m1$Brood_Status,strata = factors_m1$Nest_Brood, permutations = 999,method = "bray")
+```
+
+```{r}
+vegan::adonis(scent_m1 ~ factors_m1$Brood_Status*factors_m1$Species)
 ```
