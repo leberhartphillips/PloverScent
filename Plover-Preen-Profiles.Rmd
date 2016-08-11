@@ -80,7 +80,7 @@ indices <- which(factors$Ring %in% factors$Ring[duplicated(factors$Ring)]) # dup
 pander::pandoc.table(factors[indices,c(2:7,9,12,17,18,19)])
 ``` 
 
-Since one MP (FH47040) was sampled twice during brooding, we average the to samples, thereby we avoid pseudoreplication. 
+Since one MP (FH47040) was sampled twice during brooding, we average the to samples, thereby we avoid pseudo-replication. 
 
 ```{r}
 samples <- which(factors$Ring=="FH47040") # corresponding sample rows
