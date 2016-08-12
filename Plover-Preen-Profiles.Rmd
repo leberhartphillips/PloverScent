@@ -8,12 +8,16 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(tidy = TRUE,cache=FALSE,warning = FALSE,
                       comment = "#>",fig.width = 9,fig.height = 6,fig.align = "center",
-                      dpi = 300)
+                      dpi = 72)
 ```
 
 ## Intro
 
 This is R Markdown document provides all code necessary code to run the analysis on chemical profiles of preen gland samples of three Madagascan plover species (Kittlitz´s-, Madagascar- and White-fronted). Samples have been processed by gas-chromatography and peaks were called using **Xcalibur 2.0.5**. All further steps are reproducible with the code delivered within this document. The Document is under development and will be updated while running the analysis!
+
+## Bullet points
+* Possibility to compare scent profiles of the preen gland with the body swabs: Mantel Test to test for correlations in the similarity/ dissimilarity among individuals based on both scent profiles.
+* Comparison of odour diverstiy between both data sets
 
 ```{r,fig.align='center',echo=FALSE}
 knitr::include_graphics("plover-pics.png")
@@ -80,7 +84,7 @@ indices <- which(factors$Ring %in% factors$Ring[duplicated(factors$Ring)]) # dup
 pander::pandoc.table(factors[indices,c(2:7,9,12,17,18,19)])
 ``` 
 
-Since one MP (FH47040) was sampled twice during brooding, we average the to samples, thereby we avoid pseudo-replication. 
+Since one MP (FH47040) was sampled twice during brooding, we average the two samples, thereby we avoid pseudo-replication. 
 
 ```{r}
 samples <- which(factors$Ring=="FH47040") # corresponding sample rows
@@ -96,7 +100,7 @@ factors <- factors[-samples[2],]
 ```
 
 
-## Now we can start to analyse pattern using  Nonmetric multidimensional scaling (NMDS)
+## Now we can start to analyse patterns using  Nonmetric multidimensional scaling (NMDS)
 
 At first we want to load the package **vegan** which provides some useful functionalities
 
