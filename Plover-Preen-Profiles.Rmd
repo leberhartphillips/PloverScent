@@ -20,7 +20,7 @@ This is R Markdown document provides all code necessary code to run the analysis
 * Comparison of odour diverstiy between both data sets
 
 ```{r,fig.align='center',echo=FALSE}
-knitr::include_graphics("plover-pics.png")
+knitr::include_graphics("plover-pic.jpg")
 ```
 
 ## Getting started: Load the data and packages to the Global Environment
